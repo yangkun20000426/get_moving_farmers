@@ -107,8 +107,8 @@ const growthScale = computed(() => {
 .crop-sprite {
   width: 100%;
   height: 100%;
-  max-width: 72px;
-  max-height: 88px;
+  max-width: 102px;
+  max-height: 118px;
   display: flex;
   align-items: flex-end;
   justify-content: center;

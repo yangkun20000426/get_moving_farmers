@@ -1,6 +1,6 @@
 <!-- 小动物 SVG + 简单骨骼式动画，替代静态 emoji -->
 <template>
-  <div class="pet-sprite" :class="[`pet-${petId}`]" aria-hidden="true">
+  <div class="pet-sprite" :class="[`pet-${petId}`, { 'size-ranch': size === 'ranch' }]" aria-hidden="true">
     <svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" class="pet-svg">
       <!-- 小鸡 -->
       <g v-if="petId === 'chicken'" class="anim-bob">
@@ -68,7 +68,9 @@
 
 <script setup>
 defineProps({
-  petId: { type: String, required: true }
+  petId: { type: String, required: true },
+  /** 牧场区大号展示 */
+  size: { type: String, default: 'default' }
 })
 </script>
 
@@ -79,6 +81,12 @@ defineProps({
   display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+
+.pet-sprite.size-ranch {
+  width: 108px;
+  height: 108px;
+  filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.22));
 }
 
 .pet-svg {

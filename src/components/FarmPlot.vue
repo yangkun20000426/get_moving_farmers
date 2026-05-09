@@ -97,7 +97,7 @@ function handleClick() {
 <style scoped>
 .farm-plot {
   aspect-ratio: 1;
-  border-radius: 14px;
+  border-radius: 11px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -105,18 +105,23 @@ function handleClick() {
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  transition: transform 0.22s ease, box-shadow 0.22s ease;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, filter 0.2s ease;
+  transform-style: preserve-3d;
+  filter: drop-shadow(0 14px 10px rgba(0, 0, 0, 0.32));
   box-shadow:
-    inset 0 -12px 24px rgba(62, 39, 35, 0.35),
-    0 6px 14px rgba(0, 0, 0, 0.12);
-  border: 2px solid rgba(93, 64, 55, 0.35);
+    inset 0 3px 6px rgba(255, 255, 255, 0.22),
+    inset 0 -14px 28px rgba(62, 39, 35, 0.42),
+    0 6px 0 rgba(62, 39, 35, 0.55);
+  border: 3px solid rgba(62, 39, 35, 0.65);
 }
 
 .farm-plot:hover {
-  transform: translateY(-3px) scale(1.02);
+  transform: translateY(-5px) translateZ(12px) scale(1.03);
+  filter: drop-shadow(0 22px 16px rgba(0, 0, 0, 0.38));
   box-shadow:
-    inset 0 -12px 24px rgba(62, 39, 35, 0.3),
-    0 10px 22px rgba(0, 0, 0, 0.16);
+    inset 0 3px 6px rgba(255, 255, 255, 0.28),
+    inset 0 -14px 28px rgba(62, 39, 35, 0.38),
+    0 10px 0 rgba(62, 39, 35, 0.45);
 }
 
 .plot-soil {
@@ -137,15 +142,22 @@ function handleClick() {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 90% 40% at 30% 20%, rgba(255, 255, 255, 0.12), transparent 50%),
+    radial-gradient(ellipse 90% 40% at 30% 18%, rgba(255, 255, 255, 0.14), transparent 50%),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 9px,
+      rgba(40, 23, 18, 0.09) 9px,
+      rgba(40, 23, 18, 0.09) 11px
+    ),
     repeating-linear-gradient(
       92deg,
-      rgba(62, 39, 35, 0.08) 0,
-      rgba(62, 39, 35, 0.08) 2px,
+      rgba(62, 39, 35, 0.06) 0,
+      rgba(62, 39, 35, 0.06) 2px,
       transparent 2px,
-      transparent 7px
+      transparent 8px
     );
-  opacity: 0.85;
+  opacity: 0.95;
   pointer-events: none;
 }
 
@@ -156,12 +168,17 @@ function handleClick() {
 .plot-crop {
   position: relative;
   z-index: 1;
-  padding-bottom: 6px;
+  padding-bottom: 4px;
   flex: 1;
   display: flex;
   align-items: flex-end;
   justify-content: center;
   min-height: 0;
+}
+
+.plot-crop :deep(.crop-sprite) {
+  max-width: 102px;
+  max-height: 118px;
 }
 
 .farm-plot.ready .plot-soil {
