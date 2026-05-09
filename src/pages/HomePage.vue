@@ -1,6 +1,6 @@
 <!-- src/pages/HomePage.vue -->
 <template>
-  <div class="page">
+  <div class="page farm-home">
     <div class="farm-header">
       <div class="level-info">
         <span class="level-badge">{{ currentTitle }}</span>
@@ -11,7 +11,8 @@
       </div>
     </div>
 
-    <div class="farm-grid">
+    <div class="farm-scene">
+      <div class="farm-grid">
       <FarmPlot
         v-for="(plot, index) in state.farmGrid"
         :key="plot.id"
@@ -20,6 +21,7 @@
         @plant="showPlantModal = true; selectedPlot = index"
         @harvest="handleHarvest(index)"
       />
+      </div>
     </div>
 
     <!-- 建筑区域 -->
@@ -32,7 +34,8 @@
     <!-- 宠物区域 -->
     <div class="pets-area" v-if="state.unlockedPets.length > 0">
       <div class="pet" v-for="pid in state.unlockedPets" :key="pid">
-        <span>{{ getPetIcon(pid) }}</span>
+        <PetSprite :pet-id="pid" />
+        <span class="pet-name">{{ getPetName(pid) }}</span>
       </div>
     </div>
 
@@ -47,7 +50,9 @@
             class="crop-item"
             @click="plantCrop(cropId)"
           >
-            <span class="crop-icon">{{ getCropIcon(cropId) }}</span>
+            <div class="crop-thumb-wrap" aria-hidden="true">
+              <CropSprite :crop-id="cropId" :progress="1" :ready="false" :growing="false" />
+            </div>
             <span class="crop-name">{{ getCropName(cropId) }}</span>
             <span class="crop-price">💰{{ getCropPrice(cropId) }}</span>
           </div>
@@ -62,6 +67,8 @@ import { ref, computed } from 'vue'
 import { state, gameActions } from '../stores/gameStore.js'
 import { crops, buildings, pets, levels } from '../data/gameConfig.js'
 import FarmPlot from '../components/FarmPlot.vue'
+import PetSprite from '../components/PetSprite.vue'
+import CropSprite from '../components/CropSprite.vue'
 
 const showPlantModal = ref(false)
 const selectedPlot = ref(null)
@@ -80,11 +87,10 @@ const expProgress = computed(() => {
   return Math.min(100, (expInLevel / expNeeded) * 100)
 })
 
-function getCropIcon(id) { return crops[id]?.icon || '🌱' }
 function getCropName(id) { return crops[id]?.name || id }
 function getCropPrice(id) { return crops[id]?.price || 0 }
 function getBuildingIcon(id) { return buildings[id]?.icon || '🏠' }
-function getPetIcon(id) { return pets[id]?.icon || '🐾' }
+function getPetName(id) { return pets[id]?.name || id }
 
 function plantCrop(cropId) {
   const result = gameActions.plantCrop(selectedPlot.value, cropId)
@@ -106,6 +112,15 @@ function handleHarvest(index) {
 </script>
 
 <style scoped>
+.farm-home {
+  background: linear-gradient(180deg, #e3f2fd 0%, #e8f5e9 28%, #f1f8e9 100%);
+  border-radius: 0 0 20px 20px;
+  margin: 0 -16px;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 8px;
+}
+
 .farm-header {
   margin-bottom: 16px;
 }
@@ -118,11 +133,13 @@ function handleHarvest(index) {
 }
 
 .level-badge {
-  background: var(--primary);
+  background: linear-gradient(135deg, #66bb6a 0%, var(--primary-dark) 100%);
   color: white;
-  padding: 4px 8px;
-  border-radius: 4px;
+  padding: 6px 12px;
+  border-radius: 999px;
   font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(56, 142, 60, 0.35);
 }
 
 .exp-text {
@@ -130,22 +147,61 @@ function handleHarvest(index) {
   color: var(--text-secondary);
 }
 
+.farm-scene {
+  position: relative;
+  padding: 14px 12px 18px;
+  margin-bottom: 8px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(139, 195, 74, 0.35) 0%, rgba(104, 159, 56, 0.25) 40%, rgba(85, 139, 47, 0.2) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.farm-scene::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  background-image: radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.35) 0%, transparent 42%),
+    radial-gradient(circle at 88% 22%, rgba(255, 255, 255, 0.18) 0%, transparent 38%);
+  pointer-events: none;
+}
+
 .farm-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
 }
 
-.buildings-area, .pets-area {
+.buildings-area,
+.pets-area {
   display: flex;
-  gap: 8px;
+  gap: 12px;
   flex-wrap: wrap;
   margin-top: 16px;
 }
 
-.building, .pet {
+.building {
   font-size: 32px;
+}
+
+.pet {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 16px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+}
+
+.pet-name {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-weight: 600;
 }
 
 .modal-overlay {
@@ -193,8 +249,18 @@ function handleHarvest(index) {
   color: white;
 }
 
-.crop-icon {
-  font-size: 24px;
+.crop-thumb-wrap {
+  width: 48px;
+  height: 52px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.crop-thumb-wrap :deep(.crop-sprite) {
+  max-width: 44px;
+  max-height: 50px;
 }
 
 .crop-name {
