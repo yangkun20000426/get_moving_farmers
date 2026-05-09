@@ -218,3 +218,148 @@ body {
 .tag-success { background: #E8F5E9; color: var(--success); }
 .tag-warning { background: #FFF8E1; color: var(--warning); }
 .tag-info { background: #E3F2FD; color: #2196F3; }
+
+/* ========== FitFarm 全局主题（农场风次级页面） ========== */
+.page.page-scene {
+  margin: 0 -16px;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-bottom: 96px;
+  min-height: calc(100vh - 118px);
+  background: linear-gradient(180deg, #e3f2fd 0%, #e8f5e9 28%, #dcedc8 72%, #aed581 100%);
+}
+
+.game-panel {
+  background: linear-gradient(165deg, #fffef9 0%, #fff8e1 55%, #ffecb3 100%);
+  border: 4px solid #6d4c41;
+  border-radius: 18px;
+  padding: 18px 16px;
+  margin-bottom: 14px;
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.14),
+    inset 0 2px 0 rgba(255, 255, 255, 0.75);
+}
+
+.game-panel-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #3e2723;
+  text-align: center;
+  margin-bottom: 16px;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.game-sign-inline {
+  display: inline-block;
+  padding: 6px 20px;
+  font-size: 14px;
+  font-weight: 800;
+  color: #3e2723;
+  background: linear-gradient(180deg, #d7ccc8 0%, #bcaaa4 50%, #8d6e63 100%);
+  border-radius: 8px;
+  border: 3px solid #5d4037;
+  box-shadow: 0 3px 0 #4e342e;
+}
+
+.game-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.game-tab {
+  flex: 1;
+  text-align: center;
+  padding: 11px 6px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #33691e;
+  background: rgba(255, 255, 255, 0.75);
+  border: 3px solid #8d6e63;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.game-tab:hover {
+  transform: translateY(-1px);
+}
+
+.game-tab.active {
+  color: #fff;
+  background: linear-gradient(180deg, #66bb6a 0%, #43a047 100%);
+  border-color: #2e7d32;
+  box-shadow: 0 4px 0 #1b5e20;
+}
+
+.game-list-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 12px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 3px solid #a1887f;
+  border-radius: 14px;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.game-list-row:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(76, 175, 80, 0.25);
+}
+
+.game-list-row.muted {
+  opacity: 0.72;
+  cursor: default;
+}
+
+.game-thumb {
+  width: 52px;
+  height: 56px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.game-btn-primary-lg {
+  width: 100%;
+  padding: 14px 20px;
+  font-size: 17px;
+  font-weight: 800;
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  background: linear-gradient(180deg, #ffb300 0%, #ff8f00 45%, #ef6c00 100%);
+  border: 3px solid #e65100;
+  box-shadow: 0 5px 0 #bf360c, 0 10px 24px rgba(239, 108, 0, 0.35);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.game-btn-primary-lg:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 0 #bf360c, 0 14px 28px rgba(239, 108, 0, 0.4);
+}
+
+.game-btn-primary-lg:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #bf360c;
+}
+
+.game-btn-primary-lg:disabled {
+  background: linear-gradient(180deg, #bdbdbd 0%, #9e9e9e 100%);
+  border-color: #757575;
+  box-shadow: 0 4px 0 #616161;
+  cursor: not-allowed;
+  opacity: 0.92;
+}
+
+.tab-bar {
+  border-top: 3px solid #aed581;
+  box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.06);
+  background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%);
+}

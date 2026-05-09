@@ -1,60 +1,88 @@
-<!-- src/pages/WarehousePage.vue -->
+<!-- src/pages/WarehousePage.vue — 谷仓仓库 -->
 <template>
-  <div class="page">
-    <div class="tabs">
-      <div
+  <div class="page page-scene warehouse-page">
+    <div class="barn-header">
+      <span class="game-sign-inline">🌾 我的谷仓</span>
+      <p class="barn-sub">收获的作物会堆在这里</p>
+    </div>
+
+    <div class="game-tabs">
+      <button
         v-for="tab in tabs"
         :key="tab.id"
-        class="tab"
+        type="button"
+        class="game-tab"
         :class="{ active: activeTab === tab.id }"
         @click="activeTab = tab.id"
       >
         {{ tab.name }}
-      </div>
+      </button>
     </div>
 
-    <!-- 作物仓库 -->
-    <div v-if="activeTab === 'crops'" class="warehouse-list">
-      <div v-if="cropList.length === 0" class="empty-state">
-        仓库空空如也，快去运动打卡获取作物吧！
-      </div>
-      <div
-        v-for="item in cropList"
-        :key="item.id"
-        class="warehouse-item"
-      >
-        <span class="item-icon">{{ item.icon }}</span>
-        <div class="item-info">
-          <span class="item-name">{{ item.name }}</span>
-          <span class="item-quantity">x{{ item.quantity }}</span>
+    <div v-if="activeTab === 'crops'" class="list-block">
+      <template v-if="cropList.length === 0">
+        <div class="empty-barn">
+          <svg class="barn-illus" viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <ellipse cx="100" cy="118" rx="88" ry="14" fill="#3e2723" opacity="0.12" />
+            <path d="M24 95 L100 38 L176 95 Z" fill="#8d6e63" stroke="#5d4037" stroke-width="2" />
+            <rect x="36" y="95" width="128" height="28" rx="2" fill="#a1887f" stroke="#5d4037" stroke-width="2" />
+            <rect x="82" y="70" width="36" height="42" fill="#5d4037" rx="2" />
+            <rect x="46" y="102" width="22" height="16" fill="#5d4037" opacity="0.35" rx="1" />
+            <rect x="132" y="102" width="22" height="16" fill="#5d4037" opacity="0.35" rx="1" />
+            <path d="M100 38 L100 18 Q118 28 100 38" fill="#d7ccc8" stroke="#8d6e63" />
+          </svg>
+          <p class="empty-title">谷仓里还空着呢</p>
+          <p class="empty-desc">去「运动」页打卡，收获会自动装进谷仓～</p>
         </div>
-        <div class="item-actions">
-          <button class="btn btn-secondary" @click="sellCrop(item.id)">出售</button>
+      </template>
+      <template v-else>
+        <div
+          v-for="item in cropList"
+          :key="item.id"
+          class="game-list-row shelf-row"
+        >
+          <div class="game-thumb thumb-crop">
+            <CropSprite :crop-id="item.id" :progress="1" :ready="false" :growing="false" />
+          </div>
+          <div class="item-info">
+            <span class="item-name">{{ item.name }}</span>
+            <span class="item-qty">库存 ×{{ item.quantity }}</span>
+          </div>
+          <button type="button" class="sell-btn" @click.stop="sellCrop(item.id)">出售</button>
         </div>
-      </div>
+      </template>
     </div>
 
-    <!-- 物品仓库 -->
-    <div v-if="activeTab === 'items'" class="warehouse-list">
-      <div v-if="Object.keys(state.warehouse.items).length === 0" class="empty-state">
-        暂无物品
-      </div>
-      <div
-        v-for="(qty, id) in state.warehouse.items"
-        :key="id"
-        class="warehouse-item"
-      >
-        <span class="item-name">{{ id }}</span>
-        <span class="item-quantity">x{{ qty }}</span>
-      </div>
+    <div v-if="activeTab === 'items'" class="list-block">
+      <template v-if="Object.keys(state.warehouse.items).length === 0">
+        <div class="empty-barn mild">
+          <span class="empty-emoji">📦</span>
+          <p class="empty-title">还没有杂物</p>
+          <p class="empty-desc">药水、道具解锁后会出现在这里</p>
+        </div>
+      </template>
+      <template v-else>
+        <div
+          v-for="(qty, id) in state.warehouse.items"
+          :key="id"
+          class="game-list-row shelf-row muted-click"
+        >
+          <div class="game-thumb thumb-emoji">📦</div>
+          <div class="item-info">
+            <span class="item-name">{{ id }}</span>
+            <span class="item-qty">×{{ qty }}</span>
+          </div>
+        </div>
+      </template>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
-import { state, gameActions } from '../stores/gameStore.js'
+import { state } from '../stores/gameStore.js'
 import { crops } from '../data/gameConfig.js'
+import CropSprite from '../components/CropSprite.vue'
 
 const activeTab = ref('crops')
 
@@ -69,7 +97,6 @@ const cropList = computed(() => {
     .map(([id, quantity]) => ({
       id,
       name: crops[id]?.name || id,
-      icon: crops[id]?.icon || '📦',
       quantity
     }))
 })
@@ -79,7 +106,7 @@ function sellCrop(cropId) {
   const quantity = state.warehouse.crops[cropId]
   const totalValue = crop.sellPrice * quantity
 
-  if (confirm(`出售全部 ${crop.name} x${quantity}？获得 ${totalValue} 金币`)) {
+  if (confirm(`出售全部 ${crop.name} ×${quantity}？可获得 ${totalValue} 金币`)) {
     state.coins += totalValue
     state.warehouse.crops[cropId] = 0
   }
@@ -87,74 +114,131 @@ function sellCrop(cropId) {
 </script>
 
 <style scoped>
-.tabs {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 16px;
+.warehouse-page {
+  padding-top: 8px;
 }
 
-.tab {
-  flex: 1;
+.barn-header {
   text-align: center;
-  padding: 12px;
-  background: var(--background);
-  border-radius: 8px;
-  cursor: pointer;
+  margin-bottom: 14px;
 }
 
-.tab.active {
-  background: var(--primary);
-  color: white;
+.barn-sub {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #33691e;
+  font-weight: 600;
 }
 
-.warehouse-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.empty-barn {
+  text-align: center;
+  padding: 28px 16px 40px;
+  background: rgba(255, 255, 255, 0.55);
+  border: 3px dashed #8d6e63;
+  border-radius: 18px;
+  margin-bottom: 8px;
 }
 
-.warehouse-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 16px;
-  background: var(--surface);
-  border-radius: 8px;
-  box-shadow: 0 2px 4px var(--shadow);
+.empty-barn.mild {
+  padding: 36px 16px;
 }
 
-.item-icon {
-  font-size: 32px;
+.barn-illus {
+  width: 180px;
+  height: auto;
+  margin: 0 auto 12px;
+  display: block;
+  filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.12));
+}
+
+.empty-emoji {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.empty-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: #4e342e;
+  margin-bottom: 8px;
+}
+
+.empty-desc {
+  font-size: 13px;
+  color: #6d4c41;
+  line-height: 1.5;
+  max-width: 260px;
+  margin: 0 auto;
+}
+
+.shelf-row {
+  cursor: default;
+}
+
+.shelf-row:not(.muted-click):hover {
+  transform: translateY(-2px);
+}
+
+.muted-click {
+  cursor: default;
 }
 
 .item-info {
   flex: 1;
   display: flex;
   flex-direction: column;
+  gap: 4px;
 }
 
 .item-name {
-  font-weight: 500;
+  font-weight: 800;
+  font-size: 16px;
+  color: #3e2723;
 }
 
-.item-quantity {
-  font-size: 14px;
-  color: var(--text-secondary);
+.item-qty {
+  font-size: 13px;
+  color: #558b2f;
+  font-weight: 700;
 }
 
-.item-actions {
+.thumb-crop :deep(.crop-sprite) {
+  max-width: 46px;
+  max-height: 52px;
+}
+
+.thumb-emoji {
+  font-size: 32px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  border: 2px solid #bcaaa4;
+  width: 52px;
+  height: 52px;
   display: flex;
-  gap: 8px;
+  align-items: center;
+  justify-content: center;
 }
 
-.item-actions .btn {
-  padding: 8px 12px;
-  font-size: 12px;
+.sell-btn {
+  flex-shrink: 0;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(180deg, #78909c 0%, #546e7a 100%);
+  border: 2px solid #37474f;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 3px 0 #263238;
 }
 
-.empty-state {
-  text-align: center;
-  padding: 48px;
-  color: var(--text-secondary);
+.sell-btn:hover {
+  filter: brightness(1.05);
+}
+
+.sell-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #263238;
 }
 </style>

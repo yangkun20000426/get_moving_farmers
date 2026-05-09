@@ -58,7 +58,7 @@ export const recipes = {
 export const achievements = {
   firstExercise: { name: '初次运动', desc: '完成首次运动', reward: { coins: 100 } },
   streak7: { name: '坚持不懈', desc: '连续运动7天', reward: { crops: ['strawberry'] } },
-  streak14: { name: '���序渐进', desc: '连续运动14天', reward: { crops: ['grape'], buildings: ['petHouse'] } },
+  streak14: { name: '循序渐进', desc: '连续运动14天', reward: { crops: ['grape'], buildings: ['petHouse'] } },
   streak30: { name: '持之以恒', desc: '连续运动30天', reward: { crops: ['grape'] } },
   level5: { name: '运动达人', desc: '达到5级', reward: { coins: 500 } },
   rich: { name: '农场主', desc: '金币超过10000', reward: { diamonds: 100 } }
