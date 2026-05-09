@@ -46,8 +46,8 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { state } from './stores/gameStore.js'
+import { ref, computed, onMounted } from 'vue'
+import { state, gameActions } from './stores/gameStore.js'
 import HomePage from './pages/HomePage.vue'
 import ExercisePage from './pages/ExercisePage.vue'
 import StorePage from './pages/StorePage.vue'
@@ -79,5 +79,9 @@ const currentPage = computed(() => {
     achievement: AchievementPage
   }
   return pages[activeTab.value]
+})
+
+onMounted(() => {
+  gameActions.resolvePkChallengesIfNeeded()
 })
 </script>
