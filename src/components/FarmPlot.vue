@@ -2,10 +2,17 @@
 <template>
   <div
     class="farm-plot"
-    :class="{ ready: isReady, growing: isGrowing && !isReady, empty: !plot.crop }"
+    :class="[
+      { ready: isReady, growing: isGrowing && !isReady, empty: !plot.crop },
+      layout === 'scene25d' ? 'farm-plot--scene25d' : ''
+    ]"
     @click="handleClick"
   >
-    <div class="plot-soil" aria-hidden="true">
+    <div
+      class="plot-soil"
+      aria-hidden="true"
+      :style="soilSurfaceStyle"
+    >
       <div class="soil-shade" />
       <div class="soil-highlight" />
     </div>
@@ -36,7 +43,12 @@ import CropSprite from './CropSprite.vue'
 
 const props = defineProps({
   plot: Object,
-  index: Number
+  index: Number,
+  /** grid：普通平面；scene25d：2.5D 透视田块 + 贴图地面 */
+  layout: {
+    type: String,
+    default: 'grid'
+  }
 })
 
 const emit = defineEmits(['plant', 'harvest'])
@@ -55,6 +67,14 @@ onUnmounted(() => {
 })
 
 const crop = computed(() => (props.plot.crop ? crops[props.plot.crop] : null))
+
+/** public 目录贴图，兼容 base 子路径部署 */
+const grassUrl = `url(${import.meta.env.BASE_URL}assets/farm/grass.jpg)`
+
+const soilSurfaceStyle = computed(() => {
+  if (props.layout !== 'scene25d') return {}
+  return { '--grass-tex': grassUrl }
+})
 
 const growthProgress = computed(() => {
   if (!props.plot.plantedAt || !crop.value) return 0
@@ -278,6 +298,77 @@ function handleClick() {
   50% {
     opacity: 1;
     transform: scale(1.06);
+  }
+}
+
+/* ========== 2.5D：斜视平面田块 + 草地贴图 ========== */
+.farm-plot--scene25d {
+  width: 100%;
+  max-width: 108px;
+  margin: 0 auto;
+  border-radius: 14px;
+  border: 3px solid rgba(62, 39, 35, 0.85);
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.35),
+    inset 0 -12px 24px rgba(40, 20, 10, 0.45),
+    0 10px 18px rgba(0, 0, 0, 0.35),
+    0 4px 0 rgba(48, 30, 20, 0.65);
+  filter: drop-shadow(6px 16px 12px rgba(0, 0, 0, 0.38));
+}
+
+.farm-plot--scene25d:hover {
+  transform: translateY(-10px) translateZ(28px) scale(1.06);
+  filter: drop-shadow(10px 28px 22px rgba(0, 0, 0, 0.42));
+  z-index: 6;
+}
+
+.farm-plot--scene25d .plot-soil {
+  background-image:
+    linear-gradient(155deg, rgba(109, 76, 54, 0.72) 0%, rgba(62, 39, 35, 0.82) 100%),
+    var(--grass-tex);
+  background-size: cover, cover;
+  background-position: center, center;
+  background-blend-mode: multiply, normal;
+}
+
+.farm-plot--scene25d.empty .plot-soil {
+  background-image:
+    linear-gradient(155deg, rgba(160, 125, 95, 0.58) 0%, rgba(93, 64, 55, 0.82) 100%),
+    var(--grass-tex);
+}
+
+.farm-plot--scene25d.ready .plot-soil {
+  background-image:
+    linear-gradient(155deg, rgba(76, 175, 80, 0.52) 0%, rgba(27, 94, 32, 0.78) 100%),
+    var(--grass-tex);
+}
+
+.farm-plot--scene25d .soil-highlight {
+  opacity: 0.42;
+  mix-blend-mode: soft-light;
+}
+
+.farm-plot--scene25d .soil-shade {
+  opacity: 0.85;
+}
+
+.farm-plot--scene25d .plot-crop :deep(.crop-sprite) {
+  max-width: 92px;
+  max-height: 108px;
+  filter: drop-shadow(3px 8px 6px rgba(0, 0, 0, 0.35));
+}
+
+.farm-plot--scene25d.ready {
+  animation: plot-ready-25d 1.35s ease-in-out infinite;
+}
+
+@keyframes plot-ready-25d {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 12px rgba(255, 241, 118, 0.55)) drop-shadow(6px 16px 12px rgba(0, 0, 0, 0.35));
+  }
+  50% {
+    filter: drop-shadow(0 0 22px rgba(255, 241, 118, 0.85)) drop-shadow(8px 20px 16px rgba(0, 0, 0, 0.38));
   }
 }
 </style>

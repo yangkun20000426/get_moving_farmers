@@ -14,47 +14,25 @@
         </div>
       </header>
 
-      <!-- 农田区块 -->
-      <section class="field-block">
+      <!-- 真 3D：种植区 + 鸡舍 + 畜棚 + 牧场宠物（同一 WebGL 场景） -->
+      <section class="field-block scene-3d-section">
         <div class="sign-board">
-          <span class="sign-wood">🌾 我的农田</span>
+          <span class="sign-wood">🌾 我的农场 · 3D</span>
         </div>
-        <div class="field-mat">
-          <div class="farm-grid-stage">
-            <div class="farm-grid">
-              <FarmPlot
-                v-for="(plot, index) in state.farmGrid"
-                :key="plot.id"
-                :plot="plot"
-                :index="index"
-                @plant="showPlantModal = true; selectedPlot = index"
-                @harvest="handleHarvest(index)"
-              />
-            </div>
-          </div>
+        <div class="field-mat scene-3d-mat">
+          <p class="scene-hint">
+            Three.js 实景：草地、田垄、鸡舍与畜棚在同一空间里；拖拽旋转，点击地块播种 / 成熟后收获。宠物会出现在鸡舍或畜棚旁。
+          </p>
+          <FarmScene3D
+            :farm-grid="state.farmGrid"
+            :unlocked-pets="state.unlockedPets"
+            @plot-click="handlePlotInteract"
+          />
+          <p class="scene-3d-hint">单指拖拽旋转 · 双指缩放 · 点地块</p>
         </div>
       </section>
 
-      <!-- 牧场（草地 + 栅栏，常驻可见） -->
-      <section class="ranch-block">
-        <FarmFence />
-        <div class="ranch-ground">
-          <div class="ranch-header">
-            <span class="ranch-icon">🐄</span>
-            <span class="ranch-title">牧场</span>
-            <span class="ranch-sub">小动物在这里溜达～</span>
-          </div>
-          <div class="pets-area" v-if="state.unlockedPets.length > 0">
-            <div class="pet" v-for="pid in state.unlockedPets" :key="pid">
-              <PetSprite :pet-id="pid" size="ranch" />
-              <span class="pet-name">{{ getPetName(pid) }}</span>
-            </div>
-          </div>
-          <p v-else class="ranch-empty">解锁宠物后，它们会出现在草地上</p>
-        </div>
-      </section>
-
-      <!-- 建筑 -->
+      <!-- 设施（游戏内解锁的建筑图标，轻量列表） -->
       <section class="buildings-block" v-if="state.unlockedBuildings.length > 0">
         <div class="sign-board small">
           <span class="sign-wood">🏗️ 设施</span>
@@ -93,12 +71,10 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { state, gameActions } from '../stores/gameStore.js'
-import { crops, buildings, pets, levels } from '../data/gameConfig.js'
-import FarmPlot from '../components/FarmPlot.vue'
-import PetSprite from '../components/PetSprite.vue'
+import { crops, buildings, levels } from '../data/gameConfig.js'
 import CropSprite from '../components/CropSprite.vue'
 import FarmBackdrop from '../components/FarmBackdrop.vue'
-import FarmFence from '../components/FarmFence.vue'
+import FarmScene3D from '../components/FarmScene3D.vue'
 
 const showPlantModal = ref(false)
 const selectedPlot = ref(null)
@@ -120,7 +96,21 @@ const expProgress = computed(() => {
 function getCropName(id) { return crops[id]?.name || id }
 function getCropPrice(id) { return crops[id]?.price || 0 }
 function getBuildingIcon(id) { return buildings[id]?.icon || '🏠' }
-function getPetName(id) { return pets[id]?.name || id }
+function handlePlotInteract(index) {
+  const plot = state.farmGrid[index]
+  if (!plot?.crop) {
+    selectedPlot.value = index
+    showPlantModal.value = true
+    return
+  }
+  const crop = crops[plot.crop]
+  if (!crop || !plot.plantedAt) return
+  const elapsed = Date.now() - plot.plantedAt
+  const growTimeMs = crop.growTime * 60 * 60 * 1000
+  if (elapsed >= growTimeMs) {
+    handleHarvest(index)
+  }
+}
 
 function plantCrop(cropId) {
   const result = gameActions.plantCrop(selectedPlot.value, cropId)
@@ -243,7 +233,9 @@ function handleHarvest(index) {
 
 .field-mat {
   padding: 16px;
-  background: linear-gradient(145deg, #689f38 0%, #558b2f 55%, #33691e 100%);
+  background:
+    radial-gradient(ellipse 85% 65% at 50% 58%, rgba(129, 199, 132, 0.55) 0%, transparent 58%),
+    linear-gradient(145deg, #689f38 0%, #558b2f 55%, #33691e 100%);
   border-radius: 20px;
   border: 5px solid #4e342e;
   box-shadow:
@@ -252,96 +244,33 @@ function handleHarvest(index) {
     inset 0 -2px 0 rgba(255, 255, 255, 0.12);
 }
 
-.farm-grid-stage {
-  perspective: 880px;
-  perspective-origin: 50% 42%;
-}
-
-.farm-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 11px;
-  transform: rotateX(19deg);
-  transform-origin: 50% 100%;
-  transform-style: preserve-3d;
-  padding: 4px 2px 18px;
-}
-
-/* 牧场 */
-.ranch-block {
-  margin-top: 4px;
-}
-
-.ranch-ground {
-  position: relative;
-  min-height: 140px;
-  padding: 16px 14px 22px;
-  background-color: #7cb342;
-  background-image:
-    radial-gradient(ellipse 120% 80% at 50% 100%, rgba(67, 160, 71, 0.45) 0%, transparent 55%),
-    repeating-linear-gradient(
-      92deg,
-      rgba(255, 255, 255, 0.06) 0,
-      rgba(255, 255, 255, 0.06) 1px,
-      transparent 1px,
-      transparent 5px
-    ),
-    repeating-linear-gradient(
-      -8deg,
-      transparent,
-      transparent 3px,
-      rgba(46, 125, 50, 0.12) 3px,
-      rgba(46, 125, 50, 0.12) 6px
-    );
-  border-radius: 0 0 18px 18px;
-  border: 4px solid #6d4c41;
-  border-top: none;
-  box-shadow: inset 0 4px 20px rgba(0, 0, 0, 0.12);
-}
-
-.ranch-header {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 12px;
-}
-
-.ranch-icon {
-  font-size: 22px;
-  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
-}
-
-.ranch-title {
-  font-size: 17px;
-  font-weight: 800;
-  color: #33691e;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.45);
-}
-
-.ranch-sub {
-  font-size: 12px;
-  color: #2e7d32;
-  opacity: 0.9;
-}
-
-.ranch-empty {
-  font-size: 13px;
-  color: #33691e;
+.scene-hint {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.88);
   text-align: center;
-  padding: 20px 12px;
-  opacity: 0.85;
+  margin-bottom: 12px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  line-height: 1.45;
 }
 
-.buildings-area,
-.pets-area {
+.scene-3d-mat {
+  padding-bottom: 18px;
+}
+
+.scene-3d-hint {
+  margin-top: 10px;
+  margin-bottom: 0;
+  font-size: 11px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+.buildings-area {
   display: flex;
   gap: 14px;
   flex-wrap: wrap;
   justify-content: flex-start;
-}
-
-.buildings-area {
   padding: 8px 0 12px;
 }
 
@@ -352,26 +281,6 @@ function handleHarvest(index) {
   border-radius: 14px;
   border: 3px solid #8d6e63;
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
-}
-
-.pet {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 16px 14px;
-  background: rgba(255, 255, 255, 0.82);
-  border-radius: 18px;
-  border: 3px solid rgba(141, 110, 99, 0.85);
-  box-shadow:
-    0 8px 18px rgba(0, 0, 0, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
-}
-
-.pet-name {
-  font-size: 12px;
-  color: #4e342e;
-  font-weight: 700;
 }
 
 .modal-overlay {
