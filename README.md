@@ -277,6 +277,16 @@
 
 ---
 
+## 附录：GitHub Pages 与本地不一致时
+
+仓库若使用 **Settings → Pages → Deploy from branch → `/docs`**，线上站点来自 **`docs/` 目录里的静态文件**，不是每次 push 源码自动重新构建。
+
+- 本地 `npm run dev` 始终是最新源码。
+- 更新线上页面：在项目根执行 **`npm run gh-pages`**（会先 `vite build`，再把 `dist/` 整份同步到 `docs/`），然后 **`git add docs` 并 push**。  
+- 若仍看到旧版：浏览器 **强制刷新**（Ctrl+F5）或清空该站点缓存；CDN 偶尔有几分钟延迟。
+
+---
+
 **文档版本**：v1.0
 **创建日期**：2026-05-09
 **状态**：待实现
