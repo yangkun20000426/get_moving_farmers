@@ -314,7 +314,7 @@ export function buildFarmDecorations(scene, petPens) {
 
   const textures = spriteSchemes.map(s => createFlowerSpriteTexture(s)).filter(Boolean)
 
-  for (let i = 0; i < 17; i++) {
+  for (let i = 0; i < 8; i++) {
     const spot = randomSpot(petPens)
     if (!spot) continue
     const [x, z] = spot
@@ -336,7 +336,7 @@ export function buildFarmDecorations(scene, petPens) {
   }
 
   const tulipCols = [0xe91e63, 0xff7043, 0xffca28, 0xab47bc, 0x42a5f5]
-  for (let i = 0; i < 13; i++) {
+  for (let i = 0; i < 6; i++) {
     const spot = randomSpot(petPens)
     if (!spot) continue
     const [x, z] = spot
@@ -350,21 +350,21 @@ export function buildFarmDecorations(scene, petPens) {
     decorRoot.add(flower)
   }
 
-  for (let i = 0; i < 19; i++) {
+  for (let i = 0; i < 9; i++) {
     const spot = randomSpot(petPens)
     if (!spot) continue
     const [x, z] = spot
     decorRoot.add(meshGrassTuft(x, z))
   }
 
-  for (let i = 0; i < 7; i++) {
+  for (let i = 0; i < 3; i++) {
     const spot = randomSpot(petPens)
     if (!spot) continue
     const [x, z] = spot
     decorRoot.add(meshMushroom(x, z))
   }
 
-  for (let i = 0; i < 9; i++) {
+  for (let i = 0; i < 4; i++) {
     const spot = randomSpot(petPens)
     if (!spot) continue
     const [x, z] = spot
@@ -373,18 +373,14 @@ export function buildFarmDecorations(scene, petPens) {
 
   const hayPlaces = [
     [-13.5, -11],
-    [11.5, -7],
-    [-5.5, 6]
+    [11.5, -7]
   ]
   hayPlaces.forEach(([hx, hz]) => {
     if (isBlockedSpot(hx, hz, petPens)) return
     decorRoot.add(meshHayBaleImproved(hx, hz))
   })
 
-  const stonePlaces = [
-    [-14, 3],
-    [6, 11]
-  ]
+  const stonePlaces = [[-14, 3]]
   stonePlaces.forEach(([sx, sz]) => {
     if (isBlockedSpot(sx, sz, petPens)) return
     decorRoot.add(meshGardenStone(sx, sz))
